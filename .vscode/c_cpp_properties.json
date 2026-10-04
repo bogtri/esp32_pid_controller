@@ -1,0 +1,22 @@
+{
+  "configurations": [
+    {
+      "name": "ESP-IDF",
+      "compilerPath": "",
+      "compileCommands": "${config:idf.buildPath}/compile_commands.json",
+      "intelliSenseMode": "gcc-x86",
+      "includePath": [
+        "${workspaceFolder}/**",
+        "/Users/bohdan/.espressif/v6.0.1/esp-idf/components/**"
+      ],
+      "browse": {
+        "path": [
+          "${workspaceFolder}",
+          "/Users/bohdan/.espressif/v6.0.1/esp-idf/components"
+        ],
+        "limitSymbolsToIncludedHeaders": true
+      }
+    }
+  ],
+  "version": 4
+}
