@@ -36,17 +36,14 @@ void pwm_setup_with_defaults(PwmHandle *handle, const uint8_t pin)
     pwm_setup(handle, &pwm_config);
 }
 
-void pwm_set_duty(PwmHandle *handle, uint32_t duty)
+/*
+    Converts percentage value to PWM duty and outputs it
+*/
+void pwm_set_duty(PwmHandle *handle, float value)
 {
-    uint32_t clamped = duty > handle->pwm_max_value ? handle->pwm_max_value : duty;
-    
-    ledc_set_duty(LEDC_LOW_SPEED_MODE, handle->channel, clamped);
-    ledc_update_duty(LEDC_LOW_SPEED_MODE, handle->channel);
-}
-
-uint32_t pwm_clamp_float(PwmHandle *handle, float value)
-{
-    if (value < 0) return 0;
-    if (value > handle->pwm_max_value) return handle->pwm_max_value;
-    return (uint32_t) value;
+    if (value >= 0 && value <= handle->pwm_max_value) {
+       uint32_t duty = value * handle->pwm_max_value;
+        ledc_set_duty(LEDC_LOW_SPEED_MODE, handle->channel, duty);
+        ledc_update_duty(LEDC_LOW_SPEED_MODE, handle->channel);
+    }
 }

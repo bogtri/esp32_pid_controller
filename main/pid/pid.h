@@ -1,7 +1,7 @@
 #pragma once
 
-#define MIN_INTEGRAL -100
-#define MAX_INTEGRAL 100
+#define MIN_INTEGRAL -1000
+#define MAX_INTEGRAL 1000
 
 typedef struct
 {

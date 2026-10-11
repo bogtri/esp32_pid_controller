@@ -11,7 +11,7 @@ void adc_setup(AdcHandle *handle, const adc_channel_t channel)
 
     adc_oneshot_chan_cfg_t config = {
         .atten = ADC_DEFAULT_ATTEN,
-        .bitwidth = ADC_BITWIDTH_DEFAULT,
+        .bitwidth = ADC_BITWIDTH_12,
     };
     ESP_ERROR_CHECK(adc_oneshot_config_channel(adc_handle, channel, &config));
 

@@ -28,6 +28,4 @@ void pwm_setup(PwmHandle *handle, const PwmConfig *config);
 
 void pwm_setup_with_defaults(PwmHandle *handle, const uint8_t pin);
 
-void pwm_set_duty(PwmHandle *handle, const uint32_t duty);
-
-uint32_t pwm_clamp_float(PwmHandle *handle, float value);
+void pwm_set_duty(PwmHandle *handle, const float value);

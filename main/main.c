@@ -14,6 +14,8 @@
 
 #define PWM_PIN 6
 
+#define ADC_MAX_VALUE 4095.0f
+#define LOG_PERIOD_US 1e6
 #define SETPOINT_STEP_SCALE 100
 
 const static char *TAG = "LOG";
@@ -25,8 +27,8 @@ const EncoderConfig encoder_config = {
     .hight_limit = 1000};
 
 const PidConfig pid_config = {
-    .kp = 0.02f,
-    .ki = 0.01f,
+    .kp = 2.5f,
+    .ki = 5.0f,
     .kd = 0.0f};
 
 volatile float pid_setpoint = 3000.0f;
@@ -37,6 +39,8 @@ PidHandle pid;
 EncoderHandle encoder;
 
 SemaphoreHandle_t pid_semaphore = NULL;
+
+int64_t last_log_ts = 0;
 
 static bool IRAM_ATTR on_timer_alarm(gptimer_handle_t timer,
                                      const gptimer_alarm_event_data_t *edata,
@@ -86,7 +90,6 @@ static void setpoint_task(void *pvParameters)
 
 static void pid_task(void *pvParameters)
 {
-    static uint32_t pwm_value = 0;
     while (1)
     {
         if (xSemaphoreTake(pid_semaphore, portMAX_DELAY) == pdTRUE)
@@ -94,10 +97,17 @@ static void pid_task(void *pvParameters)
             int pid_value = adc_read_value(&adc);
             float pid_output = pid_calc(&pid, pid_setpoint, (float)pid_value);
 
-            pwm_value = pwm_clamp_float(&pwm, pwm_value + pid_output);
-            pwm_set_duty(&pwm, pwm_value);
+            float output = (pid_value + pid_output) / ADC_MAX_VALUE;
+            if (output < 0.0f) output = 0.0f;
+            if (output > 1.0f) output = 1.0f;
 
-            ESP_LOGI(TAG, "Setpoint: %.2f, Value: %.2f, Output: %.2f, PWM: %u", pid_setpoint, (float)pid_value, pid_output, pwm_value);
+            pwm_set_duty(&pwm, output);
+
+            const int64_t now_us = esp_timer_get_time();
+            if (now_us - last_log_ts > LOG_PERIOD_US) {
+                ESP_LOGI(TAG, "Setpoint: %.2f, Value: %.2f, Output: %.2f", pid_setpoint, (float)pid_value, output);
+                last_log_ts = now_us;
+            }
         }
     }
 }

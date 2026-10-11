@@ -21,16 +21,19 @@ float pid_calc(PidHandle *handle, volatile const float setpoint, const float val
     float ts = get_seconds();
     float dt = ts - handle->prev_ts;
     handle->prev_ts = ts;
-    
+
     float error = setpoint - value;
 
     handle->i += error * dt;
-    if (handle->i < MIN_INTEGRAL) handle->i = MIN_INTEGRAL;
-    if (handle->i > MAX_INTEGRAL) handle->i = MAX_INTEGRAL;
+    if (handle->i < MIN_INTEGRAL)
+        handle->i = MIN_INTEGRAL;
+    if (handle->i > MAX_INTEGRAL)
+        handle->i = MAX_INTEGRAL;
 
     float d = (error - handle->prev_error) / dt;
     handle->prev_error = error;
 
     float output = handle->kp * error + handle->ki * handle->i + handle->kd * d;
+
     return output;
 }
